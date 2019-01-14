@@ -15,17 +15,27 @@ EOF
   exit 1
 }
 
+function copy_ssh_private_key() {
+  # If the key is in ${HOME}/.ssh then don't do anything
+  if [[ "${KEY}" =~ .*/${USER}/.ssh/.*$ ]] && [ -f ${SSH_KEY} ] ; then
+      echo "Key ${KEYNAME} is in ${HOME}/.ssh, not copying"
+      return
+  fi
+
+  cp -v "${KEY}" "${SSH_KEY}"
+  chmod 600 "${SSH_KEY}"
+
+  # Needed to fix race condition
+  touch "${SSH_DIR}/config"
+}
+
 function create_ssh_config() {
-  cp -v ${KEY} ${NEWKEY}
-  chmod 600 ${NEWKEY}
-  touch ~/.ssh/config
-  cat <<EOF >> ~/.ssh/config
+  cat <<EOF >> "${SSH_DIR}/config"
 
 Host streamlit-aws
   Hostname ${IP}
   User ubuntu
-  IdentityFile ${NEWKEY}
-
+  IdentityFile ${SSH_KEY}
 EOF
 }
 
@@ -35,7 +45,7 @@ function install_streamlit_atom() {
 
 function configure_streamlit_atom() {
   # Not ideal but it works right now.
-  sed -i -e "s/localhost:8501/${IP}:8501/g" ~/.atom/packages/streamlit-atom/lib/streamlit-atom.js
+  sed -i -e "s/localhost:8501/${IP}:8501/g" "${HOME}/.atom/packages/streamlit-atom/lib/streamlit-atom.js"
 }
 
 function next_steps() {
@@ -56,17 +66,21 @@ EOF
 
 IP=$1
 KEY=$2
-NEWKEY="${HOME}/.ssh/$(basename "${KEY}")"
 
 if [ -z $IP -o -z $KEY ] ; then
   usage
 fi
 
-mkdir -p ~/.ssh ~/remote-src
+SSH_DIR="${HOME}/.ssh"
+KEYNAME="$(basename ${KEY})"
+SSH_KEY="${SSH_DIR}/${KEYNAME}"
+
+mkdir -p "${SSH_DIR}" "${HOME}/remote-src"
 
 install_streamlit_atom
 configure_streamlit_atom
 
-grep -q ${IP} ~/.ssh/config || create_ssh_config
+copy_ssh_private_key
+grep -q "${IP}" "${HOME}/.ssh/config" || create_ssh_config
 
 next_steps
