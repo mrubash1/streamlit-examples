@@ -45,7 +45,7 @@ function install_streamlit_atom() {
 
 function configure_streamlit_atom() {
   # Not ideal but it works right now.
-  sed -i -e "s/localhost:8501/${IP}:8501/g" "${HOME}/.atom/packages/streamlit-atom/lib/streamlit-atom.js"
+  sed -i -e "s|http://.*:8501|http://${IP}:8501|g" "${HOME}/.atom/packages/streamlit-atom/lib/streamlit-atom.js"
 }
 
 function next_steps() {
