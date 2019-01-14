@@ -16,14 +16,15 @@ EOF
 }
 
 function create_ssh_config() {
-  chmod 600 ${KEY}
+  cp -v ${KEY} ${NEWKEY}
+  chmod 600 ${NEWKEY}
   touch ~/.ssh/config
   cat <<EOF >> ~/.ssh/config
 
 Host streamlit-aws
   Hostname ${IP}
   User ubuntu
-  IdentityFile ${KEY}
+  IdentityFile ${NEWKEY}
 
 EOF
 }
@@ -47,7 +48,7 @@ atom ~/remote-src/verify.py
 Save file.
 
 ssh streamlit-aws
-python ~/remote-src/verify.py
+python ~/src/verify.py
 
 In Atom, Ctrl-Alt-O
 EOF
@@ -55,6 +56,7 @@ EOF
 
 IP=$1
 KEY=$2
+NEWKEY="${HOME}/.ssh/$(basename "${KEY}")"
 
 if [ -z $IP -o -z $KEY ] ; then
   usage
