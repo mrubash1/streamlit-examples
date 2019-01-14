@@ -1,3 +1,6 @@
+import gym
+import streamlit as st
+
 from q_table_learning import q_table_learning
 
 string1 = '''
