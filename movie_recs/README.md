@@ -19,8 +19,70 @@ matrix factorization techniques to generate better recommendations.
 run it over a dataset that is 200X larger than in week 3!
 
 ## To Get Started
-1. In your terminal, run the following command from the `streamlit-examples` directory:
 
-```atom . src/week1_explore.py```
+1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). Make sure you know: 
+	* where you downloaded Streamlit.pem (`PATH_TO_KEY_PAIR`), and 
+	* the IP address of your AWS instance (`AWS_INSTANCE_IP_ADDRESS`). 
 
-2. In Atom, press `ctrl+alt+r` to run the report.
+2. SSH into your AWS instance: 
+
+```shell
+chmod 400 [PATH_TO_KEY_PAIR]/Streamlit.pem
+ssh ubuntu@[AWS_INSTANCE_IP_ADDRESS] -i [PATH_TO_KEY_PAIR]/Streamlit.pem
+```
+
+3. On your AWS instance: 
+
+	i. Clone this repo: 
+
+	```shell
+	git clone https://github.com/streamlit/streamlit-examples
+	```
+
+	ii. Create the conda environment, which has all the libraries we need for this project (*this takes a few minutes*):  
+
+	```shell
+	cd streamlit-examples/movie_recs
+	conda env create -f movie_recs_env.yml 
+	``` 
+
+	iii. Activate the conda environment that you just created: 
+	```shell
+	source activate movie_recs_env
+	```
+
+4. On your local machine, in a terminal: 
+
+	i. Run this magical and totally awesome script to setup your machine to access Streamlit remotely:
+	```shell
+	curl https://raw.githubusercontent.com/streamlit/streamlit-examples/master/scripts/setup_streamlit.sh | bash -e -s [AWS_INSTANCE_IP_ADDRESS] [PATH_TO_KEY_PAIR]/Streamlit.pem
+	```
+
+	ii. Run this command to be able to remotely edit your streamlit-examples directory: 
+	```shell
+	sshfs streamlit-aws:streamlit-examples streamlit-examples
+	```
+
+	iii. Open this directory in Atom: 
+	```shell 
+	atom streamlit-examples
+	```
+
+5. Back on your AWS instance: 
+
+	i. Change into the `src` directory and run week1_explore.py
+	```shell
+	cd src
+	python week1_explore.py
+	```
+
+6. On your local machine, in Atom: 
+
+	i. Open `week1_explore.py`
+
+	ii. `ctrl+option+o` (on mac) or `ctrl+alt+o` (on ubuntu) to open the Streamlit side pane. 
+
+	iii. Your screen should look like this at this point: 
+	![alt text](static/week1-screenshot.png "Screenshot of week1_explore.py in Atom")
+
+7. Next, follow the instructions in week1_explore.py. Enjoy! 
