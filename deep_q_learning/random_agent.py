@@ -1,5 +1,4 @@
 import time
-
 from render_gym import render_text_game
 
 

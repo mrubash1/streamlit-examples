@@ -71,7 +71,7 @@ Here is the code for the random agent:
                 time.sleep(0.02)
         env.close()
 
-Let's see our random agent run on FrozenLake!
+Finally, let's see our random agent run on FrozenLake! Notice the agent (🏒) doesn't get to the goal very often...stay tuned for next week!
 
 '''
 st.write(string3)
@@ -79,8 +79,4 @@ st.write(string3)
 # Make a Streamlit object where FrozenLake plays a random agent
 st_object = st.empty()
 env = gym.make('FrozenLake-v0')
-random_agent(env, st_object, num_episodes = 10, sleep = 0.1)
-
-#TODO: finish converting text into emojis
-
-#TODO: center the games and make them bigger if possible
+random_agent(env, st_object, num_episodes = 50, sleep = 0.3)
