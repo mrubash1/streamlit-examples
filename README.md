@@ -8,7 +8,7 @@ In this project, we build a movie recommendation system together (inspired by Am
 [Project Orient](https://github.com/AstronomerAmber/Project-Orient)).
 Here is a snapshot of what you’ll create:
 [Week1](http://share.streamlit.io/0.23.0-2EMF1/index.html?id=F5rVwqPj43bt4bbdLnPua5)
-| [Week2](http://share.streamlit.io/0.23.0-2EMF1/index.html?id=SvTxtEZSStSez99zVXQwwY)
+| [Week2](http://share.streamlit.io/0.19.0-qYak/index.html?id=G9AGybo1qFHPSfCmSy2hjn)
 | [Week3](http://share.streamlit.io/0.23.0-2EMF1/index.html?id=8hMSF5ZV3Wmbg5sA3UH3gW)
 | draft: Week4
 
