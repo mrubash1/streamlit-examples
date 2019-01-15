@@ -50,11 +50,20 @@ We also specify weights for each variable. For the purposes of this guide, we
 are weighing each variable equally. Later, we can adjust these weights to tune
 the recommendations.
 """)
+
 with st.echo():
     weight_age = 0.25
     weight_gender = 0.25
     weight_job = 0.25
     weight_zip = 0.25
+
+if interactive_mode:
+    st.info("""
+    1. Now that we understand what the user input looks like, let's uncomment
+    the next section to see how we prepare the data.
+    """)
+
+# # -----------------------------------------------------------------------------
 
 def nearest_5years(x, base=5):
     return int(base * round(float(x)/base))
@@ -99,6 +108,14 @@ st.write('Here is what the users dataframe looks like before conversion:')
 st.write(users)
 st.write('And here it is after the conversion:')
 st.write(users_weighted)
+
+if interactive_mode:
+    st.info("""
+    2. Okay. Our data is prepared. Uncomment the next section to see
+    how we find similar users to this one.
+    """)
+
+# # -----------------------------------------------------------------------------
 
 st.subheader('Finding Similar Users')
 st.write("""
@@ -153,6 +170,13 @@ The above shows us for each movie ID, the number of similar users who rated it
 with st.echo():
     top_movies_list = [x - 1 for x in top_movies_list] #correct indexing
     idx = top_movies_list[::]
+
+if interactive_mode:
+    st.info("3. Uncomment next section to see what the recommendations are!")
+
+# # -----------------------------------------------------------------------------
+
+with st.echo():
     st.write(movies['movie_title'].loc[idx[0:5]])
 
 st.write("""
