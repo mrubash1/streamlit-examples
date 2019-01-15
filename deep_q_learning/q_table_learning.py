@@ -22,7 +22,7 @@ def q_table_learning(env, st_object, lr=0.8, y=0.95, num_episodes=1000):
             # Pick the best action from the Q-table, except with noise
             a = np.argmax(Q[s,:] + np.random.randn(1,env.action_space.n)*(1./(i+1)))
             # Step forward in the environment - tell it the action, get back the new state and reward
-            s1,r,done,_ = env.step(a)
+            s1,r,d,_ = env.step(a)
             # Draw the current state of the environment in Streamlit
             st_object = render_text_game(st_object, env)
             # Update Q-Table based on results of this step
