@@ -36,11 +36,17 @@ Host streamlit-aws
   Hostname ${IP}
   User ubuntu
   IdentityFile ${SSH_KEY}
+  # For remote-atom
+  RemoteForward 52698 localhost:52698
 EOF
 }
 
 function install_streamlit_atom() {
   apm list --installed --bare | grep -q streamlit-atom || apm install streamlit-atom
+}
+
+function install_remote_atom() {
+  apm list --installed --bare | grep -q remote-atom || apm install remote-atom
 }
 
 function configure_streamlit_atom() {
@@ -79,6 +85,8 @@ mkdir -p "${SSH_DIR}" "${HOME}/remote-src"
 
 install_streamlit_atom
 configure_streamlit_atom
+
+install_remote_atom
 
 copy_ssh_private_key
 grep -q "${IP}" "${HOME}/.ssh/config" || create_ssh_config
