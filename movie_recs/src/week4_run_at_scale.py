@@ -1,5 +1,5 @@
 # The published output of this file currently lives here:
-#
+# http://share.streamlit.io/0.23.0-2CETv/index.html?id=PQU3Ci77PVHDqKQAS2MKZa
 
 import keras
 import math
@@ -31,9 +31,32 @@ watch our model train on this 20 million row dataset!
 
 if interactive_mode:
     st.info("""
+    Uncomment the next section to learn what we must do to run our code
+    on a GPU.
+    """)
+
+# # -----------------------------------------------------------------------------
+
+st.header("Running on a GPU")
+st.write("""
+In order to run our code on such a large dataset in a reasonable amount of time,
+we need to run it on a GPU. For this, we've created a conda environment named
+`movie_recs_env_gpu`. The only difference being that we use the `tensorflow-gpu`
+library instead of `tensorflow`.
+
+To switch conda environments, run the following commands on your AWS instance:
+```
+source deactivate
+source activate movie_recs_env_gpu
+```
+""")
+
+if interactive_mode:
+    st.info("""
     Uncomment the next section to download the large dataset, unzip it, and read in
     ratings.csv.
     """)
+# # -----------------------------------------------------------------------------
 
 st.header("Downloading & Reading the Large Dataset")
 st.write("""
@@ -75,7 +98,6 @@ with st.echo():
         return ratings
 
     ratings_20m = read_ratings(tmp_zip_path)
-    #ratings_20m = ratings_20m[0:100]
     n_users, n_movies = len(ratings_20m.user_id.unique()), len(ratings_20m.item_id.unique())
 
 if interactive_mode:
@@ -120,13 +142,13 @@ class MyCallback(keras.callbacks.Callback):
         self._epoch = epoch
         self._epoch_header.text(f'Epoch in progress: {epoch}')
     def on_batch_end(self, batch, logs=None):
-        rows = pd.DataFrame([[logs['mean_squared_error']]],
-            columns=['mean_squared_error'])
-        if batch % 100 == 99:
+        if batch % 1000 == 999:
+            rows = pd.DataFrame([[logs['mean_squared_error']]],
+                columns=['mean_squared_error'])
             self._summary_chart.add_rows(rows)
-        batch_percent = logs['batch'] * logs['size'] / self.params['samples']
-        percent = self._epoch / self._num_epochs + (batch_percent / self._num_epochs)
-        self._progress.progress(math.ceil(percent * 100))
+            batch_percent = logs['batch'] * logs['size'] / self.params['samples']
+            percent = self._epoch / self._num_epochs + (batch_percent / self._num_epochs)
+            self._progress.progress(math.ceil(percent * 100))
     def on_epoch_end(self, epoch, logs=None):
         t = self._sample_tests
         prediction = np.round(self.model.predict([t.user_id, t.item_id]),0)
@@ -159,15 +181,24 @@ def adam_predictions_with_monitoring(x_train, x_test):
     model = keras.Model([user_input, movie_input], prod)
     model.compile('adam', 'mean_squared_error', metrics=["accuracy", "mae", "mse"])
 
-    num_epochs = 100
-    model.fit([x_train.user_id, x_train.item_id], x_train.rating, validation_data=([x_test.user_id, x_test.item_id], x_test.rating),epochs=num_epochs, verbose=0, callbacks=[MyCallback(x_test, num_epochs)])
+    num_epochs = 10
+    model.fit([x_train.user_id, x_train.item_id], x_train.rating, validation_data=([x_test.user_id, x_test.item_id], x_test.rating),epochs=num_epochs, batch_size=256, verbose=0, callbacks=[MyCallback(x_test, num_epochs)])
     return np.round(model.predict([x_test.user_id, x_test.item_id]),0), model
 
 st.header("Prediction on 20M Dataset")
 st.write("""
-In this section, we run the same code as in Week 3:
-* we split our dataset into a training dataset and a testing dataset
-* we run adam_predictions_with_monitoring()
+In this section, we run *almost* the same code as in Week 3:
+* we split our dataset into a training dataset and a testing dataset, and
+* we run adam_predictions_with_monitoring().
+
+The only difference is that we run keras with a batch_size of 256 this time. The
+batch size determines the number of training examples we push through in a pass.
+Since we can process the examples in a batch in parallel, this is the way we make
+use of our GPU. There are many factors to consider when picking a batch size,
+including the trade-offs between changing the batch size versus the number of
+epochs, how these can effect the quality of your model, and how fast your model
+will converge. We encourage the reader to do their own research and experimentation
+when working with a different dataset.
 """)
 
 if interactive_mode:
@@ -219,7 +250,7 @@ if interactive_mode:
 # ------------------------------------------------------------------------------
 
 st.write('**Keras Adam Predictions**')
-st.write(adam_preds)
+st.write(adam_preds[1:1000])
 st.write('**MSE for Keras Adam Prediction**: %s' % mean_squared_error(y_true, adam_preds))
 
 st.write("Congratulations! You've now finished the final part of this project!")
