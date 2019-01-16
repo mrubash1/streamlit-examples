@@ -60,12 +60,10 @@ If you visually "solve" the FrozenLake game and look at which safe paths you can
 '''
 
 st.write(string2)
-st.write("Final Q-Table Values:")
+st.write("**Final Q-Table Values:**")
 new_Q = np.reshape(Q, (4, 4, 4))
 final_Q = np.zeros((4,4), dtype=object)
 for i in range(4):
     for j in range(4):
         final_Q[i][j] = tuple(new_Q[i][j])
 st.write(final_Q)
-
-#TODO: plot on Breakout and show that the q-table learning agent doesn't learn

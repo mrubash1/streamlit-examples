@@ -1,84 +1,93 @@
+# Solving cartpole with DQN
+# Adapted from https://github.com/gsurma/cartpole by Greg Surma
+
+import random
 import gym
 import numpy as np
-import streamlit as st
-import time
-from io import StringIO
-import sys
-import random
-import tensorflow as tf
-import matplotlib.pyplot as plt
+from collections import deque
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import SGD
 
-normal_stdout = sys.stdout
+GAMMA = 0.95
+LEARNING_RATE = 0.001
 
-st.title('Q Network Learning')
+MEMORY_SIZE = 1000000
+BATCH_SIZE = 20
 
-#env = gym.make('CartPole-v0')
-env = gym.make('FrozenLake-v0')
+EXPLORATION_MAX = 1.0
+EXPLORATION_MIN = 0.01
+EXPLORATION_DECAY = 0.995
 
-tf.reset_default_graph()
+class DeepQNetwork():
 
-#These lines establish the feed-forward part of the network used to choose actions
-inputs1 = tf.placeholder(shape=[1,16],dtype=tf.float32)
-W = tf.Variable(tf.random_uniform([16,4],0,0.01))
-Qout = tf.matmul(inputs1,W)
-predict = tf.argmax(Qout,1)
+    def __init__(self):
+        self.exploration_rate = EXPLORATION_MAX
+        self.env = gym.make('CartPole-v1')
+        self.observation_space = self.env.observation_space.shape[0]
+        self.action_space = self.env.action_space.n
+        self.memory = deque(maxlen=MEMORY_SIZE)
+        self.model = self.small_network()
 
-#Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
-nextQ = tf.placeholder(shape=[1,4],dtype=tf.float32)
-loss = tf.reduce_sum(tf.square(nextQ - Qout))
-trainer = tf.train.GradientDescentOptimizer(learning_rate=0.1)
-updateModel = trainer.minimize(loss)
+    def small_network(self):
+        model = Sequential()
+        model.add(Dense(24, input_shape=(self.observation_space,), activation="relu"))
+        model.add(Dense(24, activation="relu"))
+        model.add(Dense(self.action_space, activation="linear"))
+        # Use mean_squared_error as the loss function
+        # Use stochastic gradient descent as the optimizer
+        model.compile(loss="mean_squared_error", optimizer=SGD(lr=LEARNING_RATE))
+        return model
 
-init = tf.initialize_all_variables()
+    def epsilon_greedy_action(self, state):
+        if np.random.rand() < self.exploration_rate:
+            return random.randrange(self.action_space)
+        q_values = self.model.predict(state)
+        return np.argmax(q_values[0])
 
-# Set learning parameters
-y = .99
-e = 0.1
-num_episodes = 2000
-#create lists to contain total rewards and steps per episode
-jList = []
-rList = []
-with tf.Session() as sess:
-    sess.run(init)
-    for i in range(num_episodes):
-        #Reset environment and get first new observation
-        s = env.reset()
-        rAll = 0
-        d = False
-        j = 0
-        #The Q-Network
-        while j < 99:
-            j+=1
-            #Choose an action by greedily (with e chance of random action) from the Q-network
-            a,allQ = sess.run([predict,Qout],feed_dict={inputs1:np.identity(16)[s:s+1]})
-            if np.random.rand(1) < e:
-                a[0] = env.action_space.sample()
-            #Get new state and reward from environment
-            s1,r,d,_ = env.step(a[0])
-            #Obtain the Q' values by feeding the new state through our network
-            Q1 = sess.run(Qout,feed_dict={inputs1:np.identity(16)[s1:s1+1]})
-            #Obtain maxQ' and set our target value for chosen action.
-            maxQ1 = np.max(Q1)
-            targetQ = allQ
-            targetQ[0,a[0]] = r + y*maxQ1
-            #Train our network using target and predicted Q values
-            _,W1 = sess.run([updateModel,W],feed_dict={inputs1:np.identity(16)[s:s+1],nextQ:targetQ})
-            rAll += r
-            s = s1
-            if d == True:
-                #Reduce chance of random action as we train the model.
-                e = 1./((i/50) + 10)
-                break
-        jList.append(j)
-        rList.append(rAll)
-print("Percent of succesful episodes: ", str(sum(rList)/num_episodes), "%")
+    def update_exploration_parameter(self):
+        self.exploration_rate *= EXPLORATION_DECAY
+        self.exploration_rate = max(EXPLORATION_MIN, self.exploration_rate)
+
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+
+    def experience_replay(self):
+        if len(self.memory) < BATCH_SIZE:
+            return
+        batch = random.sample(self.memory, BATCH_SIZE)
+        for state, action, reward, state_next, terminal in batch:
+            q_update = reward
+            if not terminal:
+                q_update = (reward + GAMMA * np.amax(self.model.predict(state_next)[0]))
+            q_values = self.model.predict(state)
+            q_values[0][action] = q_update
+            self.model.fit(state, q_values, verbose=0)
+        self.update_exploration_parameter()
+
+    def train(self):
+        rList = []
+        run = 0
+        for run in range(50):
+            state = self.env.reset()
+            state = np.reshape(state, [1, self.observation_space])
+            step = 0
+            while True:
+                step += 1
+                action = self.epsilon_greedy_action(state)
+                s1, r, done, _ = self.env.step(action)
+                r = r if not done else -r
+                s1 = np.reshape(s1, [1, self.observation_space])
+                self.remember(state, action, r, s1, done)
+                state = s1
+                if done:
+                    # The "score" in cartpole is how many steps you stayed alive
+                    print("Run: ", run, ", exploration: ", self.exploration_rate, ", score: ", step)
+                    rList.append((run, r, step))
+                    break
+                self.experience_replay()
+        print(rList)
 
 
-st.plot(rList)
-
-
-# st.write("Score over time:")
-# st.write(sum(rList)/num_episodes)
-
-# st.write("Final Q-Table Values")
-# st.write(Q)
+if __name__ == "__main__":
+    DeepQNetwork().train()

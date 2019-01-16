@@ -2,7 +2,7 @@ import time
 from render_gym import render_text_game
 
 
-def random_agent(env, st_object, num_episodes=100, sleep=0.1):
+def random_agent(env, st_object, num_episodes=3, sleep=0.1):
     # an episode is one "game", or until your agent either wins or dies
     for episode in range(num_episodes):
         env.reset()

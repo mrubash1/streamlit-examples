@@ -79,4 +79,4 @@ st.write(string3)
 # Make a Streamlit object where FrozenLake plays a random agent
 st_object = st.empty()
 env = gym.make('FrozenLake-v0')
-random_agent(env, st_object, num_episodes = 50, sleep = 0.3)
+random_agent(env, st_object, num_episodes = 5, sleep = 0.3)
