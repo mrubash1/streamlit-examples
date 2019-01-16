@@ -55,7 +55,8 @@ function install_remote_atom() {
 
 function configure_streamlit_atom() {
   # Not ideal but it works right now.
-  sed -i -e "s|123.456.789.10|${IP}|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
+  sed -i -e "s|123.456.789.10:8501|${IP}:8501|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
+  sed -i -e "s|123.456.789.10:22|streamlit-aws:22|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
 }
 
 IP=$1
