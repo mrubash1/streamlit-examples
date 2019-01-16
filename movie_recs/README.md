@@ -20,8 +20,8 @@ run it over a dataset that is 200X larger than in week 3!
 
 ## To Get Started
 
-1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). Make sure you know
-the IP address of your AWS instance (`AWS_INSTANCE_IP_ADDRESS`). 
+1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). Note the
+ IP address of your AWS instance (`AWS_INSTANCE_IP_ADDRESS`). 
 
 2. SSH into your AWS instance: 
 
@@ -31,9 +31,10 @@ ssh ubuntu@[AWS_INSTANCE_IP_ADDRESS]
 
 3. On your AWS instance: 
 
-	i. Clone this repo: 
-
+	i. Change directories into your sshfs directory and clone this repo: 
+	
 	```shell
+	cd sshfs
 	git clone https://github.com/streamlit/streamlit-examples
 	```
 
@@ -49,18 +50,11 @@ ssh ubuntu@[AWS_INSTANCE_IP_ADDRESS]
 	source activate movie_recs_env
 	```
 
-4. On your local machine, in a terminal: 
-
-	i. Run this command to be able to remotely edit your streamlit-examples directory: 
-	```shell
-	sshfs streamlit-aws:streamlit-examples streamlit-examples
-	```
-
-	ii. Open this directory in Atom: 
+4. On your local machine, in a terminal open this project in Atom:
 	```shell 
-	atom streamlit-examples
+	atom ~/remote/streamlit-examples
 	```
-
+	
 5. Back on your AWS instance: 
 
 	i. Change into the `src` directory and run week1_explore.py
