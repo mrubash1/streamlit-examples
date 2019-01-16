@@ -27,6 +27,10 @@ function copy_ssh_private_key() {
   fi
 
   cp -v "${KEY}" "${SSH_KEY}"
+}
+
+function fix_ssh_key_permissions() {
+  # Fix permissions on private key.
   chmod 600 "${SSH_KEY}"
 
   # Needed to fix race condition
@@ -66,6 +70,16 @@ if [ -z $IP -o -z $KEY ] ; then
   usage
 fi
 
+if ! echo $IP | egrep -q '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' ; then
+  echo "'${IP}' not a valid ip"
+  exit 1
+fi
+
+if ! [ -f ${KEY} ] ; then
+  echo "SSH Key '${KEY}' not found"
+  exit 1
+fi
+
 SSH_DIR="${HOME}/.ssh"
 KEYNAME="$(basename ${KEY})"
 SSH_KEY="${SSH_DIR}/${KEYNAME}"
@@ -78,6 +92,7 @@ configure_streamlit_atom
 install_remote_atom
 
 copy_ssh_private_key
+fix_ssh_key_permissions
 grep -q "${IP}" "${HOME}/.ssh/config" || create_ssh_config
 
 echo 'Done!'
