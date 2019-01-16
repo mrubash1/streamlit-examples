@@ -2,15 +2,19 @@
 
 function usage() {
   cat <<EOF
-Prerequisites.
-* Atom installed
-* sshfs installed
-* EC2 external IP address is known ie cloudformation template has been run
+Usage:
+  $0 IP_ADDRESS IDENTITY_FILE
 
-$0 '<AWS EC2 External IP Address>' '/path/to/ssh_pem_file'
+Where:
+  IP_ADDRESS is the IP address of your EC2 instance.
+  IDENTITY_FILE is the file containing your key pair for the EC2 instance.
 
-For example:
-$0 35.166.122.127 ~/.ssh/streamlit.pem
+Example:
+  $0 4.3.2.1 ~/Downloads/insight-user.pem
+
+Other prerequisites:
+  - This assumes Atom is installed. You can check with:
+    apm --version
 EOF
   exit 1
 }
@@ -51,23 +55,8 @@ function install_remote_atom() {
 
 function configure_streamlit_atom() {
   # Not ideal but it works right now.
-  sed -i -e "s|123.456.789.10|${IP}|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
-}
-
-function next_steps() {
-  cat <<EOF
-Next steps:
-
-sshfs streamlit-aws:src ~/remote-src
-
-atom ~/remote-src/verify.py
-Save file.
-
-ssh streamlit-aws
-python ~/src/verify.py
-
-In Atom, Ctrl-Alt-O
-EOF
+  sed -i -e "s|123.456.789.10:8501|${IP}:8501|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
+  sed -i -e "s|123.456.789.10:22|streamlit-aws:22|g" "${HOME}/.atom/packages/streamlit-atom/lib/ProfileManager.js"
 }
 
 IP=$1
@@ -81,7 +70,7 @@ SSH_DIR="${HOME}/.ssh"
 KEYNAME="$(basename ${KEY})"
 SSH_KEY="${SSH_DIR}/${KEYNAME}"
 
-mkdir -p "${SSH_DIR}" "${HOME}/remote-src"
+mkdir -p "${SSH_DIR}" "${HOME}/remote"
 
 install_streamlit_atom
 configure_streamlit_atom
@@ -91,4 +80,4 @@ install_remote_atom
 copy_ssh_private_key
 grep -q "${IP}" "${HOME}/.ssh/config" || create_ssh_config
 
-next_steps
+echo 'Done!'

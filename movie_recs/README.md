@@ -20,18 +20,17 @@ run it over a dataset that is 200X larger than in week 3!
 
 ## To Get Started
 
-1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). Note the
- IP address of your AWS instance (`AWS_INSTANCE_IP_ADDRESS`). 
+1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). 
 
 2. SSH into your AWS instance: 
 
 ```shell
-ssh ubuntu@[AWS_INSTANCE_IP_ADDRESS]
+ssh streamlit-aws
 ```
 
 3. On your AWS instance: 
 
-	i. Change directories into your sshfs directory and clone this repo: 
+	i. Change directories into the sshfs directory and clone this repo: 
 	
 	```shell
 	cd sshfs
