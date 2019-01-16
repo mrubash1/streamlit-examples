@@ -47,6 +47,7 @@ if interactive_mode:
 # To switch conda environments, run the following commands on your AWS instance:
 # ```
 # source deactivate
+# conda env create -f movie_recs_env_gpu.yml
 # source activate movie_recs_env_gpu
 # ```
 # """)
