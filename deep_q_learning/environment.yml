@@ -1,0 +1,12 @@
+name: streamlit-deeprl
+channels:
+  - defaults
+dependencies:
+  - python=3.5
+  - tensorflow
+  - numpy
+  - keras
+  - pip:
+    - gym
+    - streamlit
+
