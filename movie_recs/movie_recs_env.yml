@@ -10,3 +10,16 @@ dependencies:
   - streamlit
   - tensorflow
   - uszipcode
+
+name: movie_recs_env_gpu
+dependencies:
+- numpy
+- pandas
+- pip
+- python=3.6.0
+- pip:
+  - keras
+  - sklearn
+  - streamlit
+  - tensorflow-gpu
+  - uszipcode
