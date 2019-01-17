@@ -1,4 +1,8 @@
 import streamlit as st
+import gym
+import time
+
+from render_gym import render_atari_game
 
 string = '''
 
@@ -7,13 +11,10 @@ string = '''
 In Week 3 of this project, we will:
 - Define a neural network architecture in Keras
 - Define a loss function and optimization algorithm
-- Solve another OpenAI gym environment called CartPole
-- Implement a replay buffer and experience replay
+- Train the neural network to solve another OpenAI gym environment called CartPole
+- Improve the performance by implementing experience replay
 
 In an environment more complex than the 4x4 frozen lake game, it quickly becomes intractable to learn a value for every state-action pair. So we had better start estimating...and what's the only way we know how to estimate a function? With a deep neural network, of course!
-
-**Q-network learning:**
-(TODO: regression problem)
 
 **Architecture:**
 
@@ -41,11 +42,9 @@ In tensorflow, we would define this architecture like this:
         out = layers.fully_connected(out, num_outputs=512,         activation_fn=tf.nn.relu)
         out = layers.fully_connected(out, num_outputs=num_actions, activation_fn=None)
 
-However, we're going to use Keras instead of defining our network in native Tensorflow. Keras is a high-level API that sits on top of Tensorflow, and in
+However, we're going to use Keras instead of defining our network in native Tensorflow. Keras is a high-level API that sits on top of Tensorflow, and in this case it is a bit simpler to use Keras. It's a good exercise to build and train some simple networks in Tensorflow as well.
 
-It's a good exercise to build and train some simple networks in Tensorflow as well.
-
-We define the model in Keras like this:
+We're also going to use a smaller neural network to reduce the training time. We define the smaller model in Keras like this:
     from keras.models import Sequential
     from keras.layers import Dense
 
@@ -57,31 +56,31 @@ We define the model in Keras like this:
     # Use stochastic gradient descent as the optimizer
 
 **Optimization:**
-(TODO: explain loss function and stochastic gradient descent)
-
-In Keras, we define the loss function and the optimizer like this:
+We use the Mean Squared error as the loss function, and stochastic gradient descent as the optimizer, which we define in Keras like this:
 
     from keras.optimizers import SGD
 
     model.compile(loss="mean_squared_error", optimizer=SGD(lr=LEARNING_RATE))
 
-Experience Replay:
+It's interesting to try different optimizers and see how the performance changes - in particular, try the Adam optimizer and see how many episodes it takes to solve CartPole as compared to using SGD.
 
+**Next steps:**
+If we wanted to get closer to the implementation in the DQN paper, there are few more techniques to implement.
 
+First, there are a couple of image preprocessing steps between the Atari game pixels and the input to the neural net. First the images get resized to 84x84x3, and then converted to grayscale. If you'd like to read more details about the preprocessing step for Atari games, check out this [great article](https://danieltakeshi.github.io/2016/11/25/frame-skipping-and-preprocessing-for-deep-q-networks-on-atari-2600-games/) by Daniel Seita.
 
-If you'd like to see the details of the preprocessing step for Atari games, check out this great article.
+Second, the DQN paper uses a trick called Target Network Freezing. Here's the basic idea: when we're updating the neural network after ever observation, our neural net is constantly chasing a moving target. In target network freezing, we periodically copy the network and freeze its state. When calculating the loss, we compare the current value to the output of the target network. Every few thousand steps, we update the target network. This trick has the same overall goal as experience replay: to increase the stability and encourage convergence. In practice the performance benefit from target network freezing is less significant than the benefit from experience replay.
 
+Lastly, we can use a different loss function called the Huber loss. Huber loss is a piecewise function that uses Mean Squared Error for and Mean Absolute Error for large values.
 
+In code, the Huber loss looks like this:
 
-**Image preprocessing -> grayscale:**
-
-**Target Network freezing:**
-
-**Reward Clipping:**
-
-**Skipping Frames:**
-
-
+    def huber_loss(a, b):
+        error = a - b
+        if abs(error) > 1.0:
+            return abs(error) - 1/2
+        else:
+            return error*error / 2
 
 
 
@@ -92,9 +91,35 @@ st.write(string)
 # TODO: chart with score and cartpole video
 
 string2 = '''
-In Week 4, we will scale up this model and train on a GPU to solve some Atari games! This can take a few hours or a few days to train. In the meantime, you can entertain yourself by watching a random agent try to play Breakout:
+This neural network can solve the CartPole game after about a hundred episodes, which looks like this:
+
 '''
 
 st.write(string2)
 
-#TODO: insert Breakout animation
+with open('cartpole_solved.mp4', 'rb') as f:
+    video_bytes = f.read()
+    st.video(video_bytes, format='video/mp4')
+
+string3 = '''
+In Week 4, we will scale up this model and train on a GPU to solve some Atari games! This can take a few hours or a few days to train. In the meantime, you can entertain yourself by watching a random agent try to play Breakout:
+'''
+
+st.write(string3)
+
+st_object = st.empty()
+env = gym.make('Breakout-v0')
+
+for episode in range(10):
+    env.reset()
+    j = 0
+    done = False
+    while j < 99:
+        j += 1
+        render_atari_game(st_object, env, episode)
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        if done:
+            break
+        time.sleep(0.02)
+env.close()
