@@ -41,14 +41,14 @@ if interactive_mode:
 # st.write("""
 # In order to run our code on such a large dataset in a reasonable amount of time,
 # we need to run it on a GPU. For this, we've created a conda environment named
-# `movie_recs_env_gpu`. The only difference being that we use the `tensorflow-gpu`
+# `movie_recs_gpu`. The only difference being that we use the `tensorflow-gpu`
 # library instead of `tensorflow`.
 
 # To switch conda environments, run the following commands on your AWS instance:
 # ```
 # source deactivate
-# conda env create -f movie_recs_env_gpu.yml
-# source activate movie_recs_env_gpu
+# conda env create -f environment_gpu.yml
+# source activate movie_recs_gpu
 # ```
 # """)
 

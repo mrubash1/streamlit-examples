@@ -20,18 +20,18 @@ run it over a dataset that is 200X larger than in week 3!
 
 ## To Get Started
 
-1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing). 
+1. Go through the installation instructions [here](https://docs.google.com/presentation/d/1qo_MDz3iF0YRykuElF6I9WC4yAQIYzOA-GY16_NOuUM/edit?usp=sharing).
 
-2. SSH into your AWS instance: 
+2. SSH into your AWS instance:
 
 ```shell
 ssh streamlit-aws
 ```
 
-3. On your AWS instance: 
+3. On your AWS instance:
 
-	i. Change directories into the sshfs directory and clone this repo: 
-	
+	i. Change directories into the sshfs directory and clone this repo:
+
 	```shell
 	cd sshfs
 	git clone https://github.com/streamlit/streamlit-examples
@@ -41,20 +41,20 @@ ssh streamlit-aws
 
 	```shell
 	cd streamlit-examples/movie_recs
-	conda env create -f movie_recs_env.yml 
-	``` 
+	conda env create -f environment.yml
+	```
 
-	iii. Activate the conda environment that you just created: 
+	iii. Activate the conda environment that you just created:
 	```shell
-	source activate movie_recs_env
+	source activate movie_recs
 	```
 
 4. On your local machine, in a terminal open this project in Atom:
-	```shell 
+	```shell
 	atom ~/remote/streamlit-examples
 	```
-	
-5. Back on your AWS instance: 
+
+5. Back on your AWS instance:
 
 	i. Change into the `src` directory and run week1_explore.py
 	```shell
@@ -62,13 +62,13 @@ ssh streamlit-aws
 	python week1_explore.py
 	```
 
-6. On your local machine, in Atom: 
+6. On your local machine, in Atom:
 
 	i. Open `week1_explore.py`
 
-	ii. `ctrl+option+o` (on mac) or `ctrl+alt+o` (on ubuntu) to open the Streamlit side pane. 
+	ii. `ctrl+option+o` (on mac) or `ctrl+alt+o` (on ubuntu) to open the Streamlit side pane.
 
-	iii. Your screen should look like this at this point: 
+	iii. Your screen should look like this at this point:
 	![alt text](static/week1-screenshot.png "Screenshot of week1_explore.py in Atom")
 
-7. Next, follow the instructions in week1_explore.py. Enjoy! 
+7. Next, follow the instructions in week1_explore.py. Enjoy!

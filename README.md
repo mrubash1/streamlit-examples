@@ -18,3 +18,25 @@ If you are more interested in a supervised learning project, we recommend you st
 If you are interested in reinforcement learning, we recommend the Deep Q-Learning project.
 
 Enjoy!
+
+### **Installation:**
+
+The installation steps to run these projects **locally** are the same for both projects. We assume you're using `conda` or `miniconda`.
+
+Both projects have `environment.yml` files that define the project-specific dependencies.
+
+1. Check out this git repo:
+`git clone https://github.com/streamlit/streamlit-examples`
+
+2. Navigate into the project directory:
+  - For the movie recs project: `cd streamlit-examples/movie_recs`
+  - For the deep q-learning project: `cd streamlit-examples/deep_q_learning`
+
+3. Create a conda environment with all the libraries we need for the project. Conda will read the `environment.yml` file, which tells conda what to install.
+  - `conda env create -f environment.yml`
+
+4. Activate the conda environment that you just created
+  - For the movie recs project: `conda activate movie_recs`
+  - For the deep q-learning project: `conda activate deep_q_learning`
+
+5. To open your project in Atom, run: `atom .`

@@ -1,4 +1,4 @@
-name: movie_recs_env_gpu
+name: movie_recs
 dependencies:
 - numpy
 - pandas
@@ -8,5 +8,5 @@ dependencies:
   - keras
   - sklearn
   - streamlit
-  - tensorflow-gpu
+  - tensorflow
   - uszipcode
