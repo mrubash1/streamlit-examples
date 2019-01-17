@@ -1,4 +1,4 @@
-name: streamlit-deeprl
+name: deep_q_learning
 channels:
   - defaults
 dependencies:
@@ -9,4 +9,3 @@ dependencies:
   - pip:
     - gym[atari]
     - streamlit
-
