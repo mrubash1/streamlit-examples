@@ -7,6 +7,6 @@ dependencies:
   - numpy
   - keras
   - pip:
-    - gym
+    - gym[atari]
     - streamlit
 
