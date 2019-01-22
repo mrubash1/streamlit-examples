@@ -27,6 +27,10 @@ function copy_ssh_private_key() {
   fi
 
   cp -v "${KEY}" "${SSH_KEY}"
+}
+
+function fix_ssh_key_permissions() {
+  # Fix permissions on private key.
   chmod 600 "${SSH_KEY}"
 
   # Needed to fix race condition
@@ -36,13 +40,30 @@ function copy_ssh_private_key() {
 function create_ssh_config() {
   cat <<EOF >> "${SSH_DIR}/config"
 
-Host streamlit-aws
-  Hostname ${IP}
-  User ubuntu
-  IdentityFile ${SSH_KEY}
-  # For remote-atom
-  RemoteForward 52698 localhost:52698
+# STREAMLIT START
+# STREAMLIT END
 EOF
+}
+
+function modify_ssh_config() {
+  cat "${SSH_DIR}/config" | \
+  sed -e '/STREAMLIT START/,/STREAMLIT END/ {
+   /STREAMLIT START/ i\
+# STREAMLIT START\
+Host streamlit-aws\
+\  Hostname STREAMLIT_IP\
+\  User ubuntu\
+\  IdentityFile STREAMLIT_SSH_KEY\
+\  # For remote-atom\
+\  RemoteForward 52698 localhost:52698\
+# STREAMLIT END
+   d
+   }' | \
+  sed -e "s|STREAMLIT_IP|${IP}|g" \
+      -e "s|STREAMLIT_SSH_KEY|${SSH_KEY}|g" \
+    > "${SSH_DIR}/config.new"
+  mv "${SSH_DIR}/config" "${SSH_DIR}/config.backup"
+  mv "${SSH_DIR}/config.new" "${SSH_DIR}/config"
 }
 
 function install_streamlit_atom() {
@@ -66,6 +87,16 @@ if [ -z $IP -o -z $KEY ] ; then
   usage
 fi
 
+if ! echo $IP | egrep -q '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' ; then
+  echo "'${IP}' not a valid ip"
+  exit 1
+fi
+
+if ! [ -f ${KEY} ] ; then
+  echo "SSH Key '${KEY}' not found"
+  exit 1
+fi
+
 SSH_DIR="${HOME}/.ssh"
 KEYNAME="$(basename ${KEY})"
 SSH_KEY="${SSH_DIR}/${KEYNAME}"
@@ -78,6 +109,8 @@ configure_streamlit_atom
 install_remote_atom
 
 copy_ssh_private_key
-grep -q "${IP}" "${HOME}/.ssh/config" || create_ssh_config
+fix_ssh_key_permissions
+grep -q "STREAMLIT START" "${HOME}/.ssh/config" || create_ssh_config
+modify_ssh_config
 
 echo 'Done!'
